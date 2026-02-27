@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Sorter API Tester</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Character Sorter API Tester</h1>
+
+    <form id="apiTestForm">
+      <label for="email">Your Email:</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+      <label for="apiUrl">API Endpoint URL:</label>
+      <input type="text" id="apiUrl" name="apiUrl" placeholder="Enter your API URL" required>
+
+      <label for="stringData">String to Sort:</label>
+      <input type="text" id="stringData" name="stringData" placeholder="Enter string (e.g. example)" required>
+
+      <button type="submit">Test API</button>
+    </form>
+
+    <h2>Response:</h2>
+    <pre id="responseOutput">Your response will appear here</pre>
+  </div>
+
+  <script>
+    document.getElementById('apiTestForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const apiUrl = document.getElementById('apiUrl').value;
+      const stringData = document.getElementById('stringData').value;
+
+      // Construct Supabase test URL
+      const supabaseTestUrl = `https://yhxzjyykdsfkdrmdxgho.supabase.co/functions/v1/application-task?url=${encodeURIComponent(apiUrl)}&email=${encodeURIComponent(email)}`;
+
+      try {
+        // First, test your API endpoint directly
+        const sortResponse = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: stringData })
+        });
+
+        const sortData = await sortResponse.json();
+
+        // Then, also check the Supabase validation endpoint
+        const supabaseResponse = await fetch(supabaseTestUrl);
+        const supabaseData = await supabaseResponse.json();
+
+        document.getElementById('responseOutput').textContent = 
+          `Sort API Response:\n${JSON.stringify(sortData, null, 2)}\n\nSupabase Validation Response:\n${JSON.stringify(supabaseData, null, 2)}`;
+
+      } catch(err) {
+        document.getElementById('responseOutput').textContent = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
